@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <title>my-editor</title>
+    <!--<script src="http://192.168.206.243:8080/target/target-script-min.js#anonymous"></script>-->
+  </head>
+  <body onbeforeunload="unload">
+    <noscript>
+      <strong>We're sorry but my-editor doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
+    </noscript>
+    <script src="http://console.re/connector.js" data-channel="trylog" id="consolerescript"></script>
+    <script src="https://cdn.bootcss.com/moment.js/2.24.0/moment.js"></script>
+    <!--<script src="https://browser.sentry-cdn.com/4.5.3/bundle.min.js" crossorigin="anonymous"></script>-->
+    <div id="app"></div>
+    <!-- built files will be auto injected -->
+  </body>
+  <script>
+//          window.onbeforeunload = e => {
+//            e = e || window.event;
+//
+//            // 兼容IE8和Firefox 4之前的版本
+//            if (e) {
+//              e.returnValue = false;
+//            }
+//
+//            // Chrome, Safari, Firefox 4+, Opera 12+ , IE 9+
+//            return "关闭提示";
+//          };
+
+//          window.addEventListener("beforeunload", function (event) {
+//              // Cancel the event as stated by the standard.
+//              event.preventDefault();
+//              // Chrome requires returnValue to be set.
+//              event.returnValue = '';
+//          });
+
+function camelize(str) {
+    return str.replace(/[-_\s]+(.)?/g, function(match, c) {
+        console.log(match, c)
+        return c ? c.toUpperCase() : '';
+    });
+}
+camelize('-moz-transform   ')
+//Sentry.init({ dsn: 'https://29da5dc46107400f87459425ee5bd717@sentry.io/1381884' });
+  </script>
+</html>
