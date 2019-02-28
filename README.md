@@ -31,7 +31,7 @@ npm run test:e2e
 ```
 
 
-async remote component
+### async remote component
 1 product remoted component: set webpack config, whick makes .vue file into *.js;
 2 axios.get the remote *.js, change it through new Function
   axios
@@ -50,3 +50,4 @@ async remote component
              </component>
 
 
+```
