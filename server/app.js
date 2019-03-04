@@ -1,8 +1,12 @@
 var fs = require("fs");
+var path = require("path");
 var express = require("express");
 var app = express();
 var bodyParser = require("body-parser");
-app.use("/static", express.static("static"))
+
+app.use("/static", express.static(path.join(__dirname, "../static"))); //指定静态文件目录
+
+
 //获取数据库连接对象
 var mysql = require("mysql");
 var connection = mysql.createConnection({
@@ -17,6 +21,8 @@ var connection = mysql.createConnection({
 //处理post字段请求
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
+
+
 //处理跨域请求
 app.all("*", function (req, res, next) {
   res.header("Access-Control-Allow-Credentials", true);
@@ -51,13 +57,13 @@ app.post("/user/login", (req, res) => {
 app.get("/template/:name", (req, res) => {
   console.log(req.params)
   console.log(req.query)
-  fs.readFile("/Users/lvzhaohua/Documents/vue_code/my-editor/static/components/a.js", "utf-8", function(err, data){
+  fs.readFile("../static/components/a.js", "utf-8", function(err, data){
     res.send(data)
   });
   // res.send(req.query)
 })
 
-fs.readFile("/Users/lvzhaohua/Documents/vue_code/my-editor/static/components/a.js", "utf-8", function(err, data){
+fs.readFile("../static/components/a.js", "utf-8", function(err, data){
   // console.log(data);
 });
 

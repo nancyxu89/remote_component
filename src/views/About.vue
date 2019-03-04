@@ -70,7 +70,7 @@ export default {
   },
   mounted() {
     axios
-      .get("http://192.168.206.150:13001/static/components/a.js")
+      .get("http://192.168.206.98:13001/static/components/a.js")
       .then(res => {
         console.log(res);
         let Fn = Function;
