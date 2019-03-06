@@ -1,5 +1,6 @@
 <template>
     <div class="iframe-wrap">
+      <async-example></async-example>
         <p></p>
         <input type="text" v-model="val">
         <!--<button @click="sendMessage">send</button>-->
