@@ -57,15 +57,11 @@ app.post("/user/login", (req, res) => {
 app.get("/template/:name", (req, res) => {
   console.log(req.params)
   console.log(req.query)
-  fs.readFile("../static/components/a.js", "utf-8", function(err, data){
+  fs.readFile("../static/components/" + req.params.name, "utf-8", function(err, data){
     res.send(data)
   });
   // res.send(req.query)
 })
-
-fs.readFile("../static/components/a.js", "utf-8", function(err, data){
-  // console.log(data);
-});
 
 const port = 13001;
 app.listen(port, () => {

@@ -15,7 +15,13 @@
               v-bind="$attrs"
               v-on="$listeners">
       </component>
-      <!--<span> {{rawStr | json}}</span>-->
+      <component
+        :is="modeOther"
+        v-bind="{from:'test'}"
+        v-on="$listeners">
+      </component>
+      async component <a href="https://github.com/luciy/vue-async-component.git" target="_blank">git address</a>:
+    <!--<span> {{rawStr | json}}</span>-->
   </div>
 </template>
 <script>
@@ -32,11 +38,12 @@ export default {
         '"工作单位": "七一小学"}, {"姓名": "测试3", "年纪": 33, "座机": "+861063935813", "籍贯": "北京市", "职业": "程序员3", "邮箱": "30000000@qq.com", ' +
         '"手机号": "15010067553", "身份证": "110102199704308513", "兴趣爱好": "兴趣爱好3", "家庭住址": "北京市海淀区莲花池西路1号3", "工作单位": "七一小学"}]',
       formatJSON: "",
-      startTime: "2019-02-27 08:50:00",
-      endTime: "2019-02-27 18:50:00",
+      startTime: new window.moment().format("YYYY-MM-DD") + " 08:50:00",
+      endTime: new window.moment().format("YYYY-MM-DD") + " 18:50:00",
       timeDiff: "",
       toggle: false,
-      mode: ""
+      mode: "",
+      modeOther: ""
     };
   },
   methods: {
@@ -48,8 +55,8 @@ export default {
         ? endTime
         : window.moment(this.endTime)
       ).diff(startTime, "minute");
-      console.log(this.timeDiff);
-      console.log(endTime - startTime);
+      //      console.log(this.timeDiff);
+      //      console.log(endTime - startTime);
     },
     sendMessage() {
       var channel = new MessageChannel();
@@ -63,20 +70,22 @@ export default {
     },
     formatStrFn() {
       this.formatJSON = JSON.stringify(JSON.parse(this.rawStr), null, 4);
-      console.re.log(this.formatJSON);
-      console.re.log(JSON.parse(this.test));
+      //      console.re.log(this.formatJSON);
+      //      console.re.log(JSON.parse(this.test));
       //      console.re.log("console.re.log");
     }
   },
   mounted() {
-    axios
-      .get("http://192.168.206.98:13001/static/components/a.js")
-      .then(res => {
-        console.log(res);
-        let Fn = Function;
-        this.mode = new Fn(`return ${res.data}`)();
-        console.log(this.mode);
-      });
+    axios.get("http://localhost:13001/static/components/a.js").then(res => {
+      let Fn = Function;
+      this.mode = new Fn(`return ${res.data}`)();
+      console.log(this.mode);
+    });
+    axios.get("http://localhost:13001/template/hello.js").then(res => {
+      let Fn = Function;
+      this.modeOther = new Fn(`return ${res.data}`)();
+      console.log(this.modeOther);
+    });
   }
 };
 </script>
