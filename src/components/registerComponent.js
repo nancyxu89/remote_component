@@ -21,6 +21,10 @@ function validateFileName(str) {
   );
 }
 const requireComponent = require.context("./", true, /\.vue$/);
+const requireIMG = require.context("./", false, /\.jpg/);
+requireIMG.keys().forEach(path => {
+  console.log(requireIMG(path));
+});
 requireComponent.keys().forEach(filePath => {
   const componentConfig = requireComponent(filePath);
   const fileName = validateFileName(filePath);
@@ -29,5 +33,5 @@ requireComponent.keys().forEach(filePath => {
       ? capitalizeFirstLetter(componentConfig.default.name)
       : fileName;
   Vue.component(componentName, componentConfig.default || componentConfig);
-  console.log(componentName);
+  console.log(componentConfig);
 });
