@@ -29,14 +29,27 @@
       <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
       <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
     </ul>
+    <div>----------------------------------------------------------</div>
+    <test-a v-bind="$props"></test-a>
   </div>
 </template>
 
 <script>
 export default {
   name: "HelloWorld",
+  components: {
+    testA: () => import("./a.vue")
+  },
   props: {
-    msg: String
+    msg: String,
+    fn: {
+      type: Function,
+      default: () => {}
+    }
+  },
+  mounted() {
+    console.log(this.$vnode.tag);
+    console.log(this.$props);
   }
 };
 </script>

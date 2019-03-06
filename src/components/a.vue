@@ -1,11 +1,16 @@
 <template>
-  <div>{{name}}</div>
+  <div>{{params.msg}}</div>
 </template>
 <script>
 export default {
   name: "a-component",
   data() {
-    return {};
+    return {
+      params: {}
+    };
+  },
+  mounted() {
+    this.params = Object.assign({}, this.$attrs);
   }
 };
 </script>
