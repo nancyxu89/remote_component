@@ -4,6 +4,7 @@ import router from "./router";
 import store from "./store";
 import ace from "ace-builds";
 import ElementUI from "element-ui";
+import "./components/registerComponent.js";
 
 import "element-ui/lib/theme-chalk/index.css";
 import Raven from "raven-js";
