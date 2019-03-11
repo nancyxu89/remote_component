@@ -26,6 +26,7 @@
 </template>
 <script>
 import * as axios from "axios";
+import Fetch from "../assets/fetch";
 export default {
   data() {
     return {
@@ -73,18 +74,60 @@ export default {
       //      console.re.log(this.formatJSON);
       //      console.re.log(JSON.parse(this.test));
       //      console.re.log("console.re.log");
+    },
+    getTagsMap() {
+      return [...document.querySelectorAll("*")].reduce((a, c) => {
+        let tagName = c.tagName.toLowerCase();
+        if (a[tagName]) {
+          a[tagName] += 1;
+        } else {
+          a[tagName] = 1;
+        }
+        return a;
+      }, {});
     }
   },
   mounted() {
     axios.get("http://localhost:13001/static/components/a.js").then(res => {
       let Fn = Function;
       this.mode = new Fn(`return ${res.data}`)();
-      console.log(this.mode);
+      //      console.log(this.mode);
     });
-    axios.get("http://localhost:13001/template/hello.js").then(res => {
-      let Fn = Function;
-      this.modeOther = new Fn(`return ${res.data}`)();
-      console.log(this.modeOther);
+    //    axios.get("http://localhost:13001/template/hello.js").then(res => {
+    //      let Fn = Function;
+    //      this.modeOther = new Fn(`return ${res.data}`)();
+    //      //      console.log(this.modeOther);
+    //    });
+    setTimeout(() => {
+      console.log(this.getTagsMap());
+    }, 3000);
+
+    //    let responseCopy;
+    //    fetch("http://localhost:13001/template/test.json", {
+    fetch("http://localhost:13001/template/hello.js", {
+      method: "get",
+      mode: "cors",
+      headers: {
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "text/plain"
+      }
+    })
+      .then(res => {
+        return res.text();
+      })
+      .then(txt => {
+        let Fn = Function;
+        this.modeOther = new Fn(`return ${txt}`)();
+        return txt;
+      })
+      .catch(err => {
+        console.log("请求错误", err);
+      });
+    Fetch("/guest", {
+      method: "post"
+    }).then(res => {
+      console.log("Fetch", res);
+      console.log(Fetch.systemError);
     });
   }
 };

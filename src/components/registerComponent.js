@@ -33,5 +33,5 @@ requireComponent.keys().forEach(filePath => {
       ? capitalizeFirstLetter(componentConfig.default.name)
       : fileName;
   Vue.component(componentName, componentConfig.default || componentConfig);
-  console.log(componentConfig);
+  // console.log(componentConfig);
 });
