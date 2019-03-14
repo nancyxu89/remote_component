@@ -7,8 +7,12 @@
       <pre>{{formatJSON}}</pre>
       <p>开始时间: <input type="text" v-model="startTime"></p>
       <p>结束时间: <input type="text" v-model="endTime"></p>
+      <p>chars: <input type="text" v-model="chars"></p>
+      <p>{{explain}}</p>
       <button @click="toggle=!toggle">toggle</button>
       <button @click="computeTime">compute</button>
+      <button @click="flattenArray">array flatten</button>
+      <button @click="getMaxChar">get char with the max length in string</button>
       <span>{{timeDiff/60}}</span>
       <component
               :is="mode"
@@ -20,7 +24,7 @@
         v-bind="{from:'test'}"
         v-on="$listeners">
       </component>
-      async component <a href="https://github.com/luciy/vue-async-component.git" target="_blank">git address</a>:
+      async component <a href="https://github.com/luciy/vue-async-component.git" target="_blank">git address</a>
     <!--<span> {{rawStr | json}}</span>-->
   </div>
 </template>
@@ -44,7 +48,9 @@ export default {
       timeDiff: "",
       toggle: false,
       mode: "",
-      modeOther: ""
+      modeOther: "",
+      explain: "",
+      chars: ""
     };
   },
   methods: {
@@ -85,6 +91,44 @@ export default {
         }
         return a;
       }, {});
+    },
+    flattenArray() {
+      var arr2 = [
+        [1, 2, 2],
+        [3, 4, 5, 5],
+        [6, 7, 8, 9, [11, 12, [12, 13, [14]]]],
+        10
+      ];
+      Array.from(new Set([...arr2.flat(Infinity)]));
+    },
+    getMaxChar() {
+      let str = this.chars || "asddddasaassf";
+      let regx = /([a-z])\1*/g;
+      let arr = str.match(regx);
+      let start = 0;
+      let end = 0;
+      let tmp;
+      let isNeedStop = false;
+      let max = arr[0].length;
+      for (let i = 0; i < arr.length; i++) {
+        if (arr[i].length > max) {
+          max = arr[i].length;
+          end = start + arr[i].length;
+          tmp = arr[i];
+          isNeedStop = true;
+        } else {
+          !isNeedStop && (start += arr[i].length);
+        }
+      }
+      this.explain =
+        "字符串: " +
+        str +
+        "中, 最长的字符是\t" +
+        tmp +
+        ",\t开始、结束位置分别是\t" +
+        (start + 1) +
+        "、" +
+        end;
     }
   },
   mounted() {
