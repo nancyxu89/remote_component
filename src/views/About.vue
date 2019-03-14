@@ -10,7 +10,7 @@
       <p>chars: <input type="text" v-model="chars"></p>
       <p>{{explain}}</p>
       <button @click="toggle=!toggle">toggle</button>
-      <button @click="computeTime">compute</button>
+      <button @click="computeTime">compute</button><br>
       <button @click="flattenArray">array flatten</button>
       <button @click="getMaxChar">get char with the max length in string</button>
       <span>{{timeDiff/60}}</span>
