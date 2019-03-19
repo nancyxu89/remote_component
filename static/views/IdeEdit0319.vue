@@ -1080,6 +1080,7 @@
              var arr = line.split(';') || line
              var matchStr = arr[arr.length - 1]
              var regx = /^(\s*|;)(\w+)\.([a-zA-Z0-9]+)$/g
+            var libName = RegExp.$2
              if (regx.test(matchStr)) {
                window.extLangAssLib = {
                  isLib: false,
@@ -1108,6 +1109,12 @@
              } else {
                window.extLangAssLib = {
                  isLib: true
+               }
+               window.extLangAssLib.currentLib = libName
+               window.extLangAssLibUrls = {
+                 sonic: 'http://dev-cosmos.ymmoa.com/#/metadata/table-details/3',
+                 dwt: 'http://dev-cosmos.ymmoa.com/#/metadata/table-details/4',
+                 'tmp.dwt_test': 'http://dev-cosmos.ymmoa.com/#/metadata/table-details/5'
                }
                let editorCom3 = {
                  getCompletions: function(editor, session, pos, prefix, callback) {

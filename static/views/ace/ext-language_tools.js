@@ -1382,8 +1382,10 @@ var Autocomplete = function() {
         this.hideDocTooltip();
 
         this.gatherCompletionsId += 1;
-        if (this.popup && this.popup.isOpen)
+        if (this.popup && this.popup.isOpen){
             this.popup.hide();
+            window.extLangAssLib = null;
+        }
 
         if (this.base)
             this.base.detach();
@@ -1452,10 +1454,18 @@ var Autocomplete = function() {
                     this.editor.session.remove(range);
                 }
             }
-            if (data.snippet)
+            if (data.snippet){
                 snippetManager.insertSnippet(this.editor, data.snippet);
-            else
-                this.editor.execCommand("insertstring", data.value || data);
+            }
+            else {
+                var insertContent = data.value || data
+                // if (data.isLib !== undefined && data.isLib) {
+                //     // window.open(data.url, '_blank' + data.id)
+                //     insertContent = '<a href="'+ data.url +'" target="_blank'+ data.id +'">'+ insertContent +'</a>'
+                // }
+                this.editor.execCommand("insertstring", insertContent);
+            }
+
         }
         this.detach();
     };
@@ -1716,7 +1726,14 @@ var FilteredList = function(array, filterText) {
             prev = caption;
             return true;
         });
-
+        console.log(window.extLangAssLib)
+        if (window.extLangAssLib) {
+            matches = matches.filter(function(item){
+                if (item.isLib === undefined) return true
+                var isMatch = (item.isLib === window.extLangAssLib.isLib)
+                return window.extLangAssLib.isLib ? isMatch : (isMatch && item.libName === window.extLangAssLib.name)
+            });
+        }
         this.filtered = matches;
     };
     this.filterCompletions = function(items, needle) {
@@ -1936,6 +1953,27 @@ var doLiveAutocomplete = function(e) {
     }
     else if (e.command.name === "insertstring") {
         var prefix = util.getCompletionPrefix(editor);
+
+        // if (editor.$enableAssociateAutocompletion && prefix) {
+        //     var pos = editor.getCursorPosition();
+        //     var line = editor.session.getLine(pos.row).replace(/\s+/g,';');
+        //     var arr = line.split(';') || line
+        //     var matchStr = arr[arr.length - 1]
+        //     var regx = /^(\s*|;)(\w+)\.([a-zA-Z0-9]+)$/g
+        //     if (regx.test(matchStr)) {
+        //         window.extLangAssLib = {
+        //             isLib: false,
+        //             name: RegExp.$2
+        //         }
+        //         console.log(matchStr)
+        //         console.log('表名称: ' + RegExp.$2 +', 字段名: ' + RegExp.$3)
+        //     } else {
+        //         window.extLangAssLib = {
+        //             isLib: true
+        //         }
+        //         console.log('prefix: ' + prefix)
+        //     }
+        // }
         if (prefix && !hasCompleter) {
             if (!editor.completer) {
                 editor.completer = new Autocomplete();
@@ -1948,6 +1986,9 @@ var doLiveAutocomplete = function(e) {
 
 var Editor = require("../editor").Editor;
 require("../config").defineOptions(Editor.prototype, "editor", {
+    enableAssociateAutocompletion: {
+        value: false
+    },
     enableBasicAutocompletion: {
         set: function(val) {
             if (val) {

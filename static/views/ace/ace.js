@@ -16653,8 +16653,20 @@ var Text = function(parentEl) {
                 span.style.width = (token.value.length * this.config.characterWidth) + "px";
                 
             span.className = classes;
-            span.appendChild(valueFragment);
-            
+            if (classes === 'ace_identifier' && window.extLangAssLibUrls && window.extLangAssLibUrls[value]) {
+                console.log('start-extLangAssLibUrls-')
+                var a = this.dom.createElement("a")
+                a.href = window.extLangAssLibUrls[value];
+                a.target = '__blank' + window.extLangAssLibUrls[value];
+                // a.innerText = value;
+                a.style = 'pointer-events:all;text-decoration: none;'
+                a.className = classes + '-url';
+                a.appendChild(valueFragment);
+                console.log('end-extLangAssLibUrls-')
+                span.appendChild(a);
+            } else {
+                span.appendChild(valueFragment);
+            }
             parent.appendChild(span);
         }
         else {
