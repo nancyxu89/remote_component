@@ -11,9 +11,10 @@
       <p>{{explain}}</p>
       <button @click="toggle=!toggle">toggle</button>
       <button @click="computeTime">compute</button><br>
+      <span>{{timeDiff/60}}</span><br>
       <button @click="flattenArray">array flatten</button>
       <button @click="getMaxChar">get char with the max length in string</button>
-      <span>{{timeDiff/60}}</span>
+
       <component
               :is="mode"
               v-bind="$attrs"
