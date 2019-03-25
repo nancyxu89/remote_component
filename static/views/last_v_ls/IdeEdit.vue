@@ -68,12 +68,19 @@
             :key="item.idTimeStamp"
             :class="(statusType == 'result' && item.idTimeStamp==selectedResultId)? 'active': ''"
             @click="logOrResult('result',item.idTimeStamp)">
+          <i v-show="item.isLock" class="fa fa-lock"></i>
           <el-popover popper-class="result-sql" placement="top-start" trigger="hover" width="424">
             <pre class="sql-statement">{{item.sqlStatement ? item.sqlStatement : ''}}</pre>
             <span slot="reference">结果{{item.idxOfExe}}</span>
           </el-popover>
           <i class="el-icon-close" @click.stop.prevent="removeResultItem(item.idTimeStamp)"></i></li>
         <div class="tab-right">
+          <el-popover popper-class="result-sql" placement="top-start" trigger="hover" width="424">
+            <pre class="sql-statement">SQL优化建议
+              <p>1 不使用</p>
+            </pre>
+            <a class="history" href="javascript:void(0);" target="_blank" slot="reference">SQl优化建议</a>
+          </el-popover>
           <a class="history" href="#/history/list" target="_blank">查询统计与历史记录</a>
         </div>
       </div>
@@ -88,7 +95,7 @@
           </div>
         </div>
         <div class="log-info" ref="logInfo"
-             :style="'display:'+(!isEnLarge?'block':'none')+'height:'+logInfoHeight+'px'">
+             :style="'display:'+(!isEnLarge?'block':'none')+';height:'+logInfoHeight+'px'">
           <div class="error-tips" v-if="queryData.serviceTips">错误原因：{{queryData.serviceTips}}</div>
           <div class="query-log" v-html="queryData.queryLog"></div>
         </div>
@@ -99,28 +106,27 @@
             <span>显示<select v-model="recordNum" @change="selectRecordNum">
               <option v-for="val in recordNums" :value="val">{{val}}</option>
             </select>记录</span>
+            <span class="cursor-pointer"
+                  style="text-decoration: underline;margin-left: 10px;"
+                  @click="lockResultItem">窗口{{curQueryResult.isLock?'解':'上'}}锁</span>
           </div>
           <div class="opt-right">
-            <span class="download"><i class="fa fa-question cursor-pointer"
-                                      @click="dialogResHelpVisible=true"></i></span>
+            <a class="cursor-pointer" @click="dialogDownloadVisible=true"><i class="fa fa-arrow-circle-o-down"></i>下载</a>
             <span class="toggle-res" @click="toggleResultWindow" title="结果区域缩展"><i
-                :class="['fs-14 fa',!isEnLargeRes?'fa-expand':'fa-compress']"></i>&nbsp窗口</span>
-            <a class="cursor-pointer" @click="dialogDownloadVisible=true"><i class="fa fa-arrow-circle-o-down"></i>结果下载</a>
-            <span>在结果中搜索：</span>
+              :class="['fs-14 fa',!isEnLargeRes?'fa-expand':'fa-compress']" style="font-size: 16px;"></i>&nbsp;窗口</span>
+            <span class="download cursor-pointer" @click="dialogResHelpVisible=true"><i class="fa fa-question"></i>&nbsp;提示</span>
+            <!--<span>在结果中搜索：</span>-->
             <el-input v-model="searchValue" placeholder="输入后回车" clearable size="mini" @clear="searchResult"
                       @keyup.enter.native="searchResult"></el-input>
-            <!--<span class="copy">-->
-            <!--<a v-clipboard:copy="searchValue" v-clipboard:success="onCopy" v-clipboard:error="onError">复制</a>-->
-            <!--</span>-->
           </div>
         </div>
         <div class="table-mask"
              v-loading="isNeedLoading"
              element-loading-spinner="el-icon-loading"
-             :style="'display:'+(!isEnLarge&&tableMaxHeight>0?'block':'none')+''+'height:'+tableMaxHeight+'px'"
+             :style="'display:'+(!isEnLarge&&tableMaxHeight>0?'block':'none')+';'+'height:'+tableMaxHeight+'px;'"
              element-loading-background="rgba(255, 255, 255, 0)"></div>
         <div class="table" ref="logTable"
-             :style="'display:'+(!isEnLarge&&tableMaxHeight>0?'block':'none')+''+'max-height:'+(tableMaxHeight+42)+'px'">
+             :style="'display:'+(!isEnLarge&&tableMaxHeight>0?'block':'none')+';'+'max-height:'+(tableMaxHeight+42)+'px;'">
           <div :style="'max-height:'+tableMaxHeight+'px'" v-for="itemQuery in resTableData"
                :key="itemQuery.queryMainId+itemQuery.queryId" v-if="itemQuery.idTimeStamp === selectedResultId">
             <el-table
@@ -144,7 +150,7 @@
               </el-table-column>
             </el-table>
                 <span class="el-pagination__total fr mgtb-inline"
-                      style="line-height: 32px"
+                      style="line-height: 32px;"
                       v-if="itemQuery.total<recordNum+1">共 {{itemQuery.total}} 条</span>
             <el-pagination
                 v-show="itemQuery.total>recordNum"
@@ -177,13 +183,14 @@
         <el-button style="float: left" type="primary" @click="saveFast" size="small">快速保存</el-button>
         <el-button class="white-btn" @click="dialogSaveVisible = false" size="small">取 消</el-button>
         <el-button type="primary" @click="saveMakeSure" size="small">确 认</el-button>
+        <p style="font-size: 12px;color:red;text-align: left;margin-bottom: 0;">系统将默认清除2个月前的快速保存</p>
       </div>
     </el-dialog>
     <!-------------------新查询保存- 结束------------------>
     <!-------------------数据查询结果提示---记录---- 开始------------------>
     <el-dialog title="数据查询结果提示" :visible.sync="dialogResHelpVisible">
       <p class="fs-14 lh-24">查询结果最多列出200行数据。</p>
-      <!--<p class="fs-14 lh-24" style="color:red">接到最新通知，撸数全面停止下载数据功能。</p>-->
+      <!--<p class="fs-14 lh-24" style="color:red;">接到最新通知，撸数全面停止下载数据功能。</p>-->
       <p class="fs-14 lh-24">撸数将提供最多200条数据下载，如果您需要下载更多数据，可以前往Rubik系统，制作报表，按照设计的规则进行数据下载。</p>
       <p class="fs-14 lh-24">注意：查询结果排序，仅做了本页排序。如果你想做200条全量排序，可以选中每页200条。</p>
       <div slot="footer" class="dialog-footer">
@@ -243,145 +250,25 @@
   import HomeService from 'src/services/home/index'
   import ACE from 'src/assets/js/ace/ace.js'
   import 'src/assets/js/ace/ext-language_tools.js'
-//  import 'src/assets/js/ace/expand-language_tools.js'
   import 'src/assets/js/ace/mode-sql.js'
   import 'src/assets/js/ace/snippets/sql.js'
 
+  import editExec from 'src/assets/js/IdeEdit/exec.js'
+
   import SqlFormatter from 'sql-formatter'
 
+  function assignTableData (isNeedAssign, resTableData) {
+    !isNeedAssign ? (isNeedAssign = resTableData.length > 0 && this.resTableData.length === 0) : '' // 数据拉取未及时, 切换时重新赋值
+    isNeedAssign && (this.resTableData = resTableData)
+    this.$nextTick(() => {  // 视图渲染完毕, 不显示加载圈
+      this.isNeedLoading = false
+    })
+  }
+
   export default {
-    props: {
-      sqlData: {
-        type: Array,
-        default: () => []
-      },
-      queryAllObj: {
-        type: Object,
-        default: () => {
-        }
-      },
-      queryData: {
-        type: Object,
-        default: {}
-      },
-      selectTabId: {
-        type: Number,
-        default: 0
-      },
-      initSelectedResultId: {
-        type: String,
-        default: ''
-      },
-      initEditorValue: {
-        type: String,
-        default: ''
-      },
-      propOffsetHeight: {
-        type: Number,
-        default: 0
-      },
-      changeTab: {
-        type: Function,
-        default: null
-      },
-      setEditorValue: {
-        type: Function,
-        default: null
-      },
-      removeSqlText: {
-        type: Function,
-        default: null
-      },
-      setQueryData: {
-        type: Function,
-        default: null
-      },
-      updateQueryResult: {
-        type: Function,
-        default: null
-      },
-      addSqlText: {
-        type: Function,
-        default: null
-      },
-      getDescription: {
-        type: Function,
-        default: null
-      },
-      limitFileName: {
-        type: Function,
-        default: null
-      },
-      initNewMaxId: {
-        type: Number,
-        default: -99
-      },
-      initNewCount: {
-        type: Number,
-        default: 0
-      }
-    },
+    props: editExec.main.initProps(),
     data () {
-      return {
-        offsetHeight: this.propOffsetHeight,
-        logInfoHeight: 0,
-        resultLogHeight: 0,
-        editor: null,
-        recordNum: this.queryData.recordNum,
-        recordNums: [25, 50, 100, 200],
-        searchValue: this.queryData.searchValue,
-        engine: this.queryData.engine,
-        engines: [{name: 'impala', value: 'IMPALA'}, {name: 'hive', value: 'HIVE'}, {name: 'spark', value: 'SPARK'}],
-        statusType: 'log',
-        isStop: false,
-        newCount: this.initNewCount,
-        newMaxId: this.initNewMaxId,
-        defaultIndex: 2,
-        fontSizes: ['12px', '14px', '16px'],
-        dialogSaveVisible: false,
-        dialogResHelpVisible: false,
-        dialogResRowVisible: false,
-        dialogDownloadVisible: false,
-        fileDirs: [],
-        saveNewForm: {
-          id: '',
-          fileName: ''
-        },
-        isEnLarge: false,
-        isEnLargeRes: false,
-        reOffsetHeight: 0,
-        curRow: {},
-        selectedResultId: this.initSelectedResultId,
-        curQueryResult: {},
-        tableMaxHeight: 100,
-        resTableData: [],
-        isNeedLoading: false,
-        isChangeTab: false,
-        dialogThemeVisible: false,
-        aceThemeArr: {
-          merbivore: require('src/assets/js/ace/theme-merbivore.js'),
-          chrome: require('src/assets/js/ace/theme-chrome.js'),
-          dreamweaver: require('src/assets/js/ace/theme-dreamweaver.js'),
-          eclipse: require('src/assets/js/ace/theme-eclipse.js'),
-          github: require('src/assets/js/ace/theme-github.js'),
-          xcode: require('src/assets/js/ace/theme-xcode.js'),
-          sqlserver: require('src/assets/js/ace/theme-sqlserver.js'),
-          tomorrow_night_blue: require('src/assets/js/ace/theme-tomorrow_night_blue.js')
-        },
-        aceTheme: 'merbivore',
-        aceThemes: [{label: '默认（黑）', value: 'merbivore'}, {
-          label: 'Chrome（明亮）',
-          value: 'chrome'
-        }, {label: 'Dreamweaver（明亮）', value: 'dreamweaver'},
-          {label: 'Eclipse（明亮）', value: 'eclipse'}, {label: 'GitHub（明亮）', value: 'github'}, {
-            label: 'XCode（明亮）',
-            value: 'xcode'
-          },
-          {label: 'Sql Server（明亮）', value: 'sqlserver'}, {
-            label: 'Tomorrow Night Blue（黑）',
-            value: 'tomorrow_night_blue'
-          }]
-      }
+      return editExec.main.initData.call(this)
     },
     watch: {
       initSelectedResultId (to) {
@@ -419,16 +306,20 @@
     },
     methods: {
       resetSession () {
-        this.$nextTick(() => {
+        this.resSessionTimer && clearTimeout(this.resSessionTimer)
+        this.resSessionTimer = setTimeout(() => {
           // ctrl + z, 重置返回栈
-          this.editor.session.getUndoManager().reset()
-        })
+          this.editor.session.getUndoManager().reset() // 重新设置编辑器内容后, 设置返回栈为空
+          if (window.$undoManager) { // 若已记录当前SQL文件操作内容, 切换tab也切换$undoManager
+            this.editor.session.getUndoManager().$undoStack = window.$undoManager[this.selectTabId] ? window.$undoManager[this.selectTabId].$undoStack : []
+            this.editor.session.getUndoManager().$redoStack = window.$undoManager[this.selectTabId] ? window.$undoManager[this.selectTabId].$redoStack : []
+          }
+        }, 0)
       },
-      getDefaultSort(item) {
+      getDefaultSort (item) {
         return {order: item.order, prop: item.prop}
       },
-      // 当前文件执行状态
-      getStatusIcon (item) {
+      getStatusIcon (item) {  // 当前文件执行状态
         let classMap = {
           'FAILED': 'warning icon',
           'FINISHED': 'success icon',
@@ -441,13 +332,20 @@
         this.isChangeTab = true
         this.isNeedLoading = false
         this.resTimer && clearTimeout(this.resTimer) // 清除结果tab切换产生的timer
-        // 切换文件
+        window.$undoManager = window.$undoManager || {}
+        window.$undoManager[this.selectTabId] = window.$undoManager[this.selectTabId] || {}
+        window.$undoManager[this.selectTabId] = {
+          $undoStack: JSON.parse(JSON.stringify(this.editor.session.getUndoManager().$undoStack)),
+          $redoStack: JSON.parse(JSON.stringify(this.editor.session.getUndoManager().$redoStack))
+        }
+        // 切换文件前, 保存当前tab编辑区域内容
         this.setEditorValue(this.editor.getValue())
         this.setQueryData({
           selectTabId: this.selectTabId,
           idTimeStamp: (this.statusType === 'log' && this.resTableData.length !== 0) ? ('log_' + this.selectTabId) : this.selectedResultId,
           isChanged: this.queryData.isChanged
         }, 'change')
+
         this.changeTab(id)
         this.resetSession()
       },
@@ -466,13 +364,13 @@
             !!removeItem.isAdd ? (this.dialogSaveVisible = true) : this.saveSql()
           }).catch((action) => {
             if (action === 'cancel') {
-              loading ? this.removeRunSql(removeId): this.removeSqlText(removeId)
+              loading ? this.removeRunSql(removeId) : this.removeSqlText(removeId)
             } else {
               this.dialogSaveVisible = false
             }
           })
         } else {
-          loading ? this.removeRunSql(removeId): this.removeSqlText(removeId)
+          loading ? this.removeRunSql(removeId) : this.removeSqlText(removeId)
         }
       },
       removeRunSql (removeId) {
@@ -507,7 +405,7 @@
         // 获取执行SQL结果数据
         HomeService.runSQLResult({queryId: queryId}).then((res) => {
           let result = res.data
-          result.queryLog = result.queryLog.replace(/\n/g, "<br/>")
+          result.queryLog = result.queryLog.replace(/\n/g, '<br/>')
 
           let columnNames = result.columnNames || []
           columnNames = columnNames.filter(item => {
@@ -569,22 +467,21 @@
         this.setQueryData({canEdit: false}, 'canEdit')
         this.isStop = false
 
-        let selectedSQL = {}
         let isAdd = false
         let isChanged = false
         let selectTabId = this.selectTabId
         this.sqlData.map(item => {
-          item.id === selectTabId ? (selectedSQL = item, isAdd = !!item.isAdd, isChanged = item.queryData.isChanged) : ''
+          item.id === selectTabId ? (isAdd = !!item.isAdd, isChanged = item.queryData.isChanged) : ''
         })
         !isAdd && isChanged && this.saveSql(true)
 
         HomeService.runSQLSubmit({
-          application: "hive-web",   //提交sql的项目代号，撸数指定 hive-web
-          execMode: this.engine,   //执行引擎，目前支持：IMPALA,HIVE
-          roleName: this.queryData.currentGroupValue, //用户所属开发组this.queryData.currentGroupValue
+          application: 'hive-web',   // 提交sql的项目代号，撸数指定 hive-web
+          execMode: this.engine,   // 执行引擎，目前支持：IMPALA,HIVE
+          roleName: this.queryData.currentGroupValue, // 用户所属开发组this.queryData.currentGroupValue
           hql: editorValue,          // 执行sql
           rowLimit: 200,      // 查询结果限制，目前最大支持1000 ，
-          properties: ""       //其他一些查询属性设置，保留字段，目前传空字符串
+          properties: ''       // 其他一些查询属性设置，保留字段，目前传空字符串
         }).then((res) => {
           let resData = res.data
           if (resData.code === 200 && !this.isStop) {
@@ -609,7 +506,7 @@
         if (!this.queryData.loading) {
           return
         }
-        //停止执行sql
+        // 停止执行sql
         if (this.queryData.queryId) {
           this.isStop = true
           await HomeService.stopSQLQuery({queryId: this.queryData.queryId})
@@ -634,7 +531,7 @@
           })
 
           if (resData.success) {
-            if (typeof(isFromRun) !== 'boolean') { // 来自@click
+            if (typeof isFromRun !== 'boolean') {
               isFromRun = false
             }
             !isFromRun ? this.$message.success('保存成功！') : ''
@@ -653,15 +550,6 @@
         // 格式选中的sql
         if (this.editor.getCopyText()) {
           editorValue = this.editor.getCopyText()
-          // editorValue: 要查找的字符串或正则表达式
-          // backwards: 是否反向搜索，默认为false
-          // wrap: 搜索到文档底部是否回到顶端，默认为false
-          // caseSensitive: 是否匹配大小写搜索，默认为false
-          // wholeWord: 是否匹配整个单词搜素，默认为false
-          // range: 搜索范围，要搜素整个文档则设置为空
-          // regExp: 搜索内容是否是正则表达式，默认为false
-          // start: 搜索起始位置
-          // skipCurrent: 是否不搜索当前行，默认为false
           this.editor.find(editorValue, {
             backwards: false,
             wrap: false,
@@ -682,12 +570,6 @@
         a.setAttribute('target', '_blank' + this.curQueryResult.queryId)
         a.click()
       },
-      onCopy (e) {
-        this.$message.success('复制成功！')
-      },
-      onError (e) {
-        this.$message.success('复制失败！')
-      },
       selectEngine () {
         // 选择执行引擎
         this.setQueryData({
@@ -705,6 +587,26 @@
         }, 'selectRecord')
         this.filterTableData(1)
       },
+      lockResultItem () {
+        let pos = -1
+        let count = 0
+        let isLock = false
+        this.queryAllObj[this.selectTabId].map((item, index) => {
+          item.isLock ? count++ : ''
+          if (item.idTimeStamp === this.selectedResultId) {
+            isLock = item.isLock
+            pos = index
+          }
+        })
+        if (count > 4 && !isLock) {
+          this.$message.warning('加锁数量不能超过5个。')
+          return
+        }
+
+        this.$set(this.queryAllObj[this.selectTabId][pos], 'isLock', !isLock)
+        this.$set(this.curQueryResult, 'isLock', !isLock)
+        this.$forceUpdate()
+      },
       searchResult () {
         // 查询结果,在结果中搜索【输入后回车】
         this.updateQueryResult({
@@ -714,8 +616,7 @@
         this.setCurQueryResult(this.selectedResultId)
         this.filterTableData(1)
       },
-      runTips () {
-        // 提示
+      runTips () { // 提示
         this.$message.success('上次提交的SQL还未完成。')
       },
       removeResultItem (idTimeStamp) {
@@ -724,10 +625,10 @@
         curData.map((item, index) => {
           item.idTimeStamp === idTimeStamp && (isDeletedIndex = index)
         })
-        let isDisplace = ( this.selectedResultId === idTimeStamp )
+        let isDisplace = (this.selectedResultId === idTimeStamp)
 
         this.$nextTick(() => {
-          if (this.statusType !== 'log' && isDisplace) {// 删除项是选中项
+          if (this.statusType !== 'log' && isDisplace) { // 删除项是选中项
             // 变更选中结果, 左移, 设置简单的当前选中结果项
             let addItem = isDeletedIndex === 0 && curData.length > 1 ? curData[1] : null
             let toggleItem = addItem || curData[isDeletedIndex - 1] || curData[isDeletedIndex - 2] || {idTimeStamp: ''}
@@ -752,18 +653,17 @@
         this.$emit('removeResultItem', idTimeStamp)
       },
       setCurQueryResult (idTimeStamp, isNeedAssign = false) {
-        this.isNeedLoading = true //上方tab切换、结果tab切换
-//          this.isNeedLoading = isNeedAssign
+        this.isNeedLoading = true // 上方tab切换、结果tab切换
         let resTableData = JSON.parse(JSON.stringify(this.queryAllObj))[this.selectTabId] || []
         let oldTabId = idTimeStamp.split('_')[2]
         if (oldTabId && (oldTabId !== (this.selectTabId + ''))) {
           (resTableData === undefined || resTableData.length === 0) ? (this.statusType = 'log') : ''
         } else {
           // 设置简单的当前选中结果项
-          let params = ['columnNames', 'engine', 'recordNum', 'searchValue', 'queryId', 'idTimeStamp', 'currentPage']
+          let params = ['columnNames', 'engine', 'recordNum', 'searchValue', 'queryId', 'idTimeStamp', 'currentPage', 'isLock']
           resTableData.map((item, index) => {
             if (item.idTimeStamp === idTimeStamp) {
-              for (let i = 0 i < params.length i++) {
+              for (let i = 0; i < params.length; i++) {
                 this.curQueryResult[params[i]] = item[params[i]]
               }
               this.curQueryResult['index'] = index
@@ -775,29 +675,19 @@
 
           // 执行SQL tab 切换时
           // 每页展示数量 * 当前table属性值个数, 预计渲染 tr 个数, 预计涉及html标签个数
-          // total 超过1600, 放入宏队列 未超出采用$nextTick(支持promise情况下,放入微队列) 延迟加载
+          // total 超过1600, 放入宏队列; 未超出采用$nextTick(支持promise情况下,放入微队列); 延迟加载
 //              let total = this.recordNum * (this.curQueryResult.columnNames.length + 1)
 
           this.resTimer && clearTimeout(this.resTimer)
           this.resTimer = setTimeout(() => {
-            assignTableData()
-          }, 150) //统一延迟加载, 部分结果单个属性,存储数据量大
+            assignTableData.call(this, isNeedAssign, resTableData)
+          }, 150) // 统一延迟加载, 部分结果单个属性,存储数据量大
 //              if (total > 1600) {
-//                  this.resTimer = setTimeout(() => { assignTableData() }, 300)
+//                  this.resTimer = setTimeout(() => { assignTableData.call(this, isNeedAssign, resTableData) }, 300)
 //              } else {
-////                  this.$nextTick( () => { assignTableData() })
-//                  this.resTimer = setTimeout(() => { assignTableData() }, 100) //考虑到部分结果,表属性单个存储量大
+//                  this.$nextTick(() => { assignTableData.call(this, isNeedAssign, resTableData) })
+//                  this.resTimer = setTimeout(() => { assignTableData.call(this, isNeedAssign, resTableData) }, 100) // 考虑到部分结果,表属性单个存储量大
 //              }
-
-          let _this = this
-
-          function assignTableData() {
-            !isNeedAssign ? (isNeedAssign = resTableData.length > 0 && _this.resTableData.length === 0) : '' // 数据拉取未及时, 切换时重新赋值
-            isNeedAssign && (_this.resTableData = resTableData)
-            _this.$nextTick(() => {
-              _this.isNeedLoading = false
-            }) //视图渲染完毕, 不显示加载圈
-          }
         }
       },
       filterTableData (pageIdx = 1) {
@@ -856,7 +746,8 @@
       },
       saveMakeSure () {
         let params = {
-          type: 0, level: 1,
+          type: 0,
+          level: 1,
           parentid: this.saveNewForm.id,
           fileName: this.saveNewForm.fileName,
           fileContent: this.editor.getValue()
@@ -868,7 +759,10 @@
       },
       buildQuery () {
         this.addSqlText({
-          isAdd: true, id: (--this.newMaxId), fileName: '(新查询)-' + (++this.newCount), editorValue: '',
+          isAdd: true,
+          id: (--this.newMaxId),
+          fileName: '(新查询)-' + (++this.newCount),
+          editorValue: '',
           initNewCount: this.newCount
         })
         this.$nextTick(() => {
@@ -902,7 +796,8 @@
         !this.isEnLarge && (this.logInfoHeight = this.reOffsetHeight * 0.3 - 76)
         this.resultLogHeight = !this.isEnLarge ? (this.reOffsetHeight * 0.3) : 76
 
-        let aceOffset = this.isEnLarge ? (75 + 136) : (this.reOffsetHeight * 0.3 + 136)
+        let height = this.$store.state.isHideHeader ? 76 : 136
+        let aceOffset = this.isEnLarge ? (75 + height) : (this.reOffsetHeight * 0.3 + height)
         this.timer && clearTimeout(this.timer)
         this.isEnLarge ? resizeEditor(aceOffset) : ''
         this.timer = setTimeout(() => { // 缩小时, 延迟变更编辑器高度, 提升体验
@@ -910,12 +805,12 @@
           this.timer = null
         }, 300)
 
-        function resizeEditor(aceOffset) {
+        function resizeEditor (aceOffset) {
           _this.$refs.aceEdit.style.height = (_this.offsetHeight - aceOffset) + 'px'
           _this.editor.resize(true)
         }
 
-        this.$emit('toggleWindow', !this.isEnLarge)
+        // this.$emit('toggleWindow', !this.isEnLarge)
       },
       toggleResultWindow () {
         // 放大 缩小 结果区域
@@ -936,13 +831,13 @@
         }
         this.editor.resize(true)
 
-        this.$emit('toggleWindow', !this.isEnLargeRes)
+        // this.$emit('toggleWindow', !this.isEnLargeRes)
       },
       handleSaveClose () {
         this.saveNewForm = {id: '', fileName: ''}
       },
       handleRowDBClick (row) {
-        //双击结果表格,弹窗当前行数据
+        // 双击结果表格,弹窗当前行数据
         this.dialogResRowVisible = true
         this.curRow = row
       },
@@ -989,220 +884,64 @@
           }
         }
       },
-      updateEditorHeight (height) {
+      updateEditorHeight (height, isChangeHeader = false) {
         // ctrl+F,全屏来回切换,更新编辑器高度
         let aceEditRawHeight = (this.$refs.aceEdit.style.height + '').replace('px', '')
         let aceEditHeight = (+aceEditRawHeight + height)
         this.$refs.aceEdit.style.height = aceEditHeight + 'px'
         this.editor.resize(true)
-        if (this.isEnLargeRes) { //放大结果区时, 调整结果窗口大小
+        if (this.isEnLargeRes) { // 放大结果区时, 调整结果窗口大小
           this.tableMaxHeight = this.tableMaxHeight + height
           this.logInfoHeight = this.logInfoHeight + height
           this.resultLogHeight = this.resultLogHeight + height
         }
+        isChangeHeader && this.setReOffsetHeight()
       },
       toggleThemeOK () {
-        let oldTheme = window.localStorage.getItem('aceTheme') || ''
-        oldTheme = 'theme-' + oldTheme
-        let bodyClassName = document.body.className || ''
-        bodyClassName = bodyClassName.replace(' ' + oldTheme, '').replace(oldTheme + ' ', '').replace(oldTheme, '')
-        window.localStorage.setItem('aceTheme', this.aceTheme)
-        this.editor.setTheme(this.aceThemeArr[this.aceTheme])
-        this.dialogThemeVisible = false
-        document.body.className = bodyClassName + ' ' + ('theme-' + this.aceTheme)
+        // 编辑器主题切换
+        editExec.main.toggleTheme.call(this)
+      },
+      addEditorCompleter () {
+        HomeService.queryTable({dbId: '', tableName: ''}).then((res) => {
+          if (res.data.respCode.code === 200) {
+            let arr = []
+            res.data.data.map(raw => {
+              let item = {
+                meta: '库.表',
+                value: raw.tableName,
+                isLib: true,
+                score: Infinity
+              }
+              arr.push(item)
+            })
+            editExec.extend.addEditorCompleter.call(this, arr)
+          }
+        })
       },
       setReOffsetHeight () {
-        this.reOffsetHeight = (parseInt(this.offsetHeight) - 136)
+        let height = this.$store.state.isHideHeader ? 76 : 136
+        this.reOffsetHeight = (parseInt(this.offsetHeight) - height)
         const availHeight = window.screen.availHeight
         const clientHeight = document.body.clientHeight
         if (availHeight - clientHeight > 150) {
           this.offsetHeight = availHeight - 150
-          this.reOffsetHeight = (parseInt(this.offsetHeight) - 136)
+          this.reOffsetHeight = (parseInt(this.offsetHeight) - height)
         }
       }
     },
     mounted () {
       this.setReOffsetHeight()
       this.getAllDir()
-      // 编辑器api参考 https://ace.c9.io/
-      // this.editor.getValue() 获取值
-      // this.editor.setValue(value, index) 设置值
-      // this.editor.insert(value) 插入字段
-      // this.editor.getCopyText() 获取选中的值
-      const aceEdit = this.$refs.aceEdit
-      aceEdit.style.fontSize = this.fontSizes[this.defaultIndex]
-      aceEdit.style.height = `${(this.reOffsetHeight * 0.7) - 1}px`
-      this.$refs.resultLog.style.bottom = 0
-      this.logInfoHeight = (this.reOffsetHeight * 0.3) - 76 // 获取日志信息高度
-      this.resultLogHeight = this.reOffsetHeight * 0.3 // 日志+结果tab高度
-      let aceTheme = window.localStorage.getItem('aceTheme') || 'merbivore'
-      let editor = ACE.edit(aceEdit)
-      this.aceTheme = aceTheme
-      editor.setTheme(this.aceThemeArr[aceTheme]) //设置主题
-      editor.session.setMode('ace/mode/sql') //设置语法
-      editor.setShowPrintMargin(false) //是否分屏
-      editor.setHighlightActiveLine(false)
-      editor.setOptions({
-        enableAssociateAutocompletion: true, // 设置表字段联想提示
-        enableLiveAutocompletion: true, // 设置提示
-        enableSnippets: true // 设置snippets提示
-      })
-      editor.resize(true) // 触发尺寸缩放
-      editor.setShowInvisibles(false) // 设置空格符、换行符
-      this.editor = editor
-      this.editor.setValue(this.initEditorValue, 1)
-      this.editor.on("change", () => {
-        this.setQueryData({
-          isChanged: true
-        }, 'change')
-
-//        if (!this.isChangeTab) { // 防止tab切换操作表字段联想功能
-//          let pos = editor.getCursorPosition()
-//          let line = editor.session.getLine(pos.row)
-//          console.log('line---------' + line)
-////        let regx = /(?:[\s])(\w+)(?:\.)$|^(\w+)(?:\.)$|^(\w+(?:_\w+))(?:\.)$|(?:[\s])(\w+(?:_\w+))(?:\.)$|(?:\w+\.)(\w+)(?:\.)$|(?:\w+\.)(\w+(?:_\w+))(?:\.)$/g
-//          let regx = /(?:[\s])(\w+)(?:\.)$|^(\w+)(?:\.)$|^(\w+(?:_\w+))(?:\.)$|(?:[\s])(\w+(?:_\w+))(?:\.)$/g
-//          let matchStr = line.match(regx) ? line.match(regx)[0].replace('','').replace('.','') : null
-//            console.log(matchStr)
-//          if (matchStr && this.editor.session.$mode.$highlightRules.$keywordList.indexOf(matchStr) === -1) {
-//            if (line.match(regx)) {
-//              let arr = [{caption: "depart_id", value: "depart_id", score: 1, meta: "network"},
-//                  {caption: "depart_name", value: "depart_name", score: 2, meta: "network"}]
-//               this.editor.execCommand("startAssociate", {refs: arr, keyword: matchStr})
-//            }
-//          }
-//        } else {
-//            this.$nextTick(() => { this.isChangeTab = false })
-//        }
-         if (editor.$enableAssociateAutocompletion) {
-             var pos = editor.getCursorPosition()
-             var line = editor.session.getLine(pos.row).replace(/\s+/g,'')
-             var arr = line.split('') || line
-             var matchStr = arr[arr.length - 1]
-             var regx = /^(\s*|)(\w+)\.([a-zA-Z0-9]+)$/g
-            var libName = RegExp.$2
-             if (regx.test(matchStr)) {
-               window.extLangAssLib = {
-                 isLib: false,
-                 name: RegExp.$2
-               }
-               editor.completers[3] && (editor.completers[3] = {getCompletions: function (editor, session, pos, prefix, callback) {
-                 return callback(null, [])
-               }})
-               setTimeout(() => {
-                 editor.completers.length > 4 ? editor.completers.pop() : ''
-                 editor.completers.push({
-                   getCompletions: function(editor, session, pos, prefix, callback) {
-                     if (prefix.length === 0) {
-                       return callback(null, [])
-                     } else {
-                       return callback(null, [
-                         //                              {meta: "表名称", isLib: false, value: "svn_1220", score:9},
-                         {meta: "表名称", isLib: false, value: "dbid_ol_crm_test2", score:9, libName: 'dwt'}
-                         //                              {meta: "表名称", isLib: false, value: "dbid_test2", score:9, libName: 'sonic'}
-                       ])
-                     }
-                   }
-                 })
-                 editor.completer.updateCompletions(false)
-               }, 1000)
-             } else {
-               window.extLangAssLib = {
-                 isLib: true
-               }
-               window.extLangAssLib.currentLib = libName
-               window.extLangAssLibUrls = {
-                 sonic: 'http://dev-cosmos.ymmoa.com/#/metadata/table-details/3',
-                 dwt: 'http://dev-cosmos.ymmoa.com/#/metadata/table-details/4',
-                 'tmp.dwt_test': 'http://dev-cosmos.ymmoa.com/#/metadata/table-details/5'
-               }
-               let editorCom3 = {
-                 getCompletions: function(editor, session, pos, prefix, callback) {
-                   if (prefix.length === 0) {
-                     return callback(null, [])
-                   } else {
-                     return callback(null, [
-                       {meta: "库", isLib: true, value: "sonic", score: Infinity},
-                       {meta: "部门业绩按天统计", isLib: true, value: "tmp.dwt_test", score: Infinity},
-                       {meta: "库", isLib: true, value: "dwt", score: Infinity, id: 90, url: 'http://dev-cosmos.ymmoa.com/#/metadata/table-details/5'},
-                       //              {meta: "表名称", isLib: false, value: "svn_1220", score:9},
-                       //              {meta: "表名称", isLib: false, value: "dbid_ol_crm_test2", score:9, libName: 'dwt'},
-                       //              {meta: "表名称", isLib: false, value: "dbid_test2", score:9, libName: 'sonic'}
-                     ])
-                   }
-                 }
-               }
-               editor.completers[3] ? (editor.completers[3] = editorCom3) : editor.completers.push(editorCom3)
-             }
-         }
-
-      })
-      this.resetSession()
-      //执行(ctrl + enter),保存(alt + s)
-      window.addEventListener(
-          "keydown",
-          e => {
-            if (e.ctrlKey && e.keyCode === 13) { // ctrl + enter
-              this.ctrlKeyTimer && clearTimeout(this.ctrlKeyTimer)
-              this.ctrlKeyTimer = setTimeout(() => {
-                this.queryData.loading ? this.runTips() : this.runSql()
-              }, 100)
-            } else if (this.dialogSaveVisible && e.keyCode === 13) { // enter, 保存新增
-              this.addTimer && clearTimeout(this.addTimer)
-              this.addTimer = setTimeout(() => {
-                this.saveMakeSure()
-              }, 100)
-            }
-            else if (this.dialogThemeVisible && e.keyCode === 13) { // enter, 主题切换
-              this.$refs.themeSelect.blur()
-              this.toggleThemeOK()
-            }
-//                  else if (e.altKey && e.keyCode == 83) { // alt + s
-//                      this.saveSql()
-//                  }
-          },
-          false
-      )
-
-      // 设置body-class
-      let bodyClassName = document.body.className || ''
-      let themeClass = 'theme-' + aceTheme
-      bodyClassName = bodyClassName.replace(' ' + themeClass, '').replace(themeClass + ' ', '').replace(themeClass, '')
-      document.body.className = bodyClassName + (bodyClassName != '' ? ' ' : '') + 'theme-' + this.aceTheme
-
-      this.editor.completers.length > 3 ? this.editor.completers.pop() : ''
-      this.editor.completers.push({
-        getCompletions: function(editor, session, pos, prefix, callback) {
-          if (prefix.length === 0) {
-            return callback(null, [])
-          } else {
-            return callback(null, [{meta: "库", isLib: true, value: "sonic", score: Infinity},
-              {meta: "库", isLib: true, value: "dwt", score: Infinity},
-//              {meta: "表名称", isLib: false, value: "svn_1220", score:9},
-//              {meta: "表名称", isLib: false, value: "dbid_ol_crm_test2", score:9, libName: 'dwt'},
-//              {meta: "表名称", isLib: false, value: "dbid_test2", score:9, libName: 'sonic'}
-            ])
-          }
-        }
-      })
-//      var langTools = ACE.require("ace/ext/language_tools")
-//      langTools.addCompleter({
-//        getCompletions: function(editor, session, pos, prefix, callback) {
-//          if (prefix.length === 0) {
-//            return callback(null, [])
-//          } else {
-//            return callback(null, [{meta: "库", isLib: true, caption: "sonic", value: "sonic", score: Infinity},
-//              {meta: "库", isLib: true, caption: "dwt", value: "dwt", score: Infinity},
-//              {meta: "表名称", isLib: false, caption: "svn_1220", value: "svn_1220", score:9},
-//              {meta: "表名称", isLib: false, caption: "dbid_ol_crm_test2", value: "dbid_ol_crm_test2", score:9, libName: 'dwt'},
-//              {meta: "表名称", isLib: false, caption: "dbid_test2", value: "dbid_test2", score:9, libName: 'sonic'}])
-//          }
-//        }
-//      })
+      // 初始化编辑器
+      editExec.main.init.call(this, ACE)
+      // 执行(ctrl + enter),保存(alt + s)
+      editExec.extend.addWindowEventListener.call(this)
+      // 编辑器, 注入自定义提示
+      this.addEditorCompleter()
     },
     destroyed () {
       // 组件销毁时, 移除代码补全弹框
-      for(let item of document.getElementsByClassName('ace_editor')) {
+      for (let item of document.getElementsByClassName('ace_editor')) {
         document.body.removeChild(item)
       }
     }
@@ -1217,19 +956,4 @@
 
   >>>  .ace_content
     z-index 1
-
-  >>> .ace_line
-        display flex
-        justify-content flex-start
-        align-items center
-      & .ace_completion-highlight, & .ace_completion-meta
-        flex-shrink 0
-      & .ace_
-        flex-shrink: 10
-        display inline-block
-        max-width 100px
-        overflow hidden
-        text-overflow ellipsis
-        white-space nowrap
-
 </style>

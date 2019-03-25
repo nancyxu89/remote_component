@@ -1,5 +1,7 @@
 # Created by .ignore support plugin (hsz.mobi)
 dist/
 src/assets/js/expand-language_tools.js
+src/assets/js/ext-language_tools_0318.js
+src/assets/js/commit-tools.js
 src/assets/js/rili.js
 static/

@@ -46,6 +46,11 @@ app.post("/user/login", (req, res) => {
 app.post("/guest", (req, res) => {
   res.send({ code: 1, data: [{name: "xyy", age: 30}] })
 })
+app.post("/test", (req, res) => {
+  console.log(req.body)
+  var result = req.body
+  res.send(JSON.stringify(result));
+})
 app.get("/template/:name", (req, res) => {
   console.log(req.params)
   console.log(req.query)

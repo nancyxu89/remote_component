@@ -30,7 +30,7 @@
   </div>
 </template>
 <script>
-import * as axios from "axios";
+import axios from "axios";
 import Fetch from "../assets/fetch";
 export default {
   data() {
@@ -133,11 +133,16 @@ export default {
     }
   },
   mounted() {
-    axios.get("http://localhost:13001/static/components/a.js").then(res => {
-      let Fn = Function;
-      this.mode = new Fn(`return ${res.data}`)();
-      //      console.log(this.mode);
-    });
+    axios
+      .get("http://localhost:13001/static/components/a.js")
+      .then(res => {
+        let Fn = Function;
+        this.mode = new Fn(`return ${res.data}`)();
+        //      console.log(this.mode);
+      })
+      .catch(err => {
+        console.log("axios error", err);
+      });
     //    axios.get("http://localhost:13001/template/hello.js").then(res => {
     //      let Fn = Function;
     //      this.modeOther = new Fn(`return ${res.data}`)();
@@ -173,6 +178,19 @@ export default {
     }).then(res => {
       console.log("Fetch", res);
       console.log(Fetch.systemError);
+    });
+    // formdata 传参
+    axios.post("http://localhost:13001/test", JSON.stringify([1, 2, 3]));
+    let arr = [1, "2", 3];
+    // payload形式传参
+    axios({
+      method: "post",
+      url: "http://localhost:13001/test",
+      headers: {
+        "Content-Type": "application/json;charset=UTF-8"
+      },
+      params: arr,
+      data: JSON.stringify(arr)
     });
   }
 };

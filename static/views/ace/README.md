@@ -53,6 +53,9 @@
 
 ###IdeEdit.vue
 ```
+score: Infinity,才能保持始终出现在第一位
+```
+```
 场景: 库表名称联想 + 添加库外链
 功能点: editor.completers添加自定义completer, editor 监听 change , 动态更新completer
 实现方法:
