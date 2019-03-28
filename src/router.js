@@ -4,6 +4,8 @@ import Home from "./views/Home.vue";
 import ACE from "./views/ace.vue";
 import Iframe from "./views/iframe.vue";
 import Table from "./views/table.vue";
+import TestNextTick from "./views/TestNextTick.vue";
+import Theme from "./views/Theme.vue";
 
 Vue.use(Router);
 
@@ -30,6 +32,16 @@ export default new Router({
       path: "/table",
       name: "table",
       component: Table
+    },
+    {
+      path: "/nextTick",
+      name: "TestNextTick",
+      component: TestNextTick
+    },
+    {
+      path: "/theme",
+      name: "Theme",
+      component: Theme
     },
     {
       path: "/about",
