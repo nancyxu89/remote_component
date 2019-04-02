@@ -6,8 +6,10 @@ import ace from "ace-builds";
 import ElementUI from "element-ui";
 import "./components/registerComponent.js";
 import "./components/advComponent";
-
-import "element-ui/lib/theme-chalk/index.css";
+import Child from "./views/slot/child";
+Vue.component("child", Child);
+// import "element-ui/lib/theme-chalk/index.css";
+import "./assets/styles/element-variables.scss";
 import Raven from "raven-js";
 import RavenVue from "raven-js/plugins/vue";
 import "./assets/watermark.js";

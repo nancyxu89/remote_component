@@ -195,3 +195,8 @@ export default {
   }
 };
 </script>
+<style lang="scss" scoped>
+.about p {
+  color: var(--mytheme-p-color);
+}
+</style>

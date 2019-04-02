@@ -4,7 +4,7 @@
       <router-link to="/">Home</router-link> |
       <router-link to="/about">About</router-link>|
       <router-link to="/ace">ACE</router-link>|
-      <router-link to="/iframe">iframe</router-link>
+      <router-link to="/theme">theme</router-link>
       <!--<router-link to="/nextTick">test nexttick</router-link>-->
         <!--|<a href=" http://localhost:8080/" target="_blank">click</a>-->
     </div>
