@@ -27,6 +27,7 @@
 </template>
 <script>
 import Parent from "./slot/parent";
+
 export default {
   name: "app",
   components: { Parent },

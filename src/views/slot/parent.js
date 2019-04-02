@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   name: "parent",
   props: {
     message: {
@@ -17,7 +17,6 @@ module.exports = {
     //     text: this.message
     //   })
     // ]);
-    console.log(this);
     let elems = [];
     this.$scopedSlots.default
       ? elems.push(
