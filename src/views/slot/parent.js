@@ -17,6 +17,7 @@ export default {
     //     text: this.message
     //   })
     // ]);
+    console.log(this.$scopedSlots);
     let elems = [];
     this.$scopedSlots.default
       ? elems.push(

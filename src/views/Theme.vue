@@ -1,12 +1,15 @@
 <template>
   <div class="theme-wrap" :class="themeClass">
     <parent :message="msg">
-      <template slot-scope="{text}">
+      <template slot="header" slot-scope="{text}">
         {{text}}
       </template>
       <div>test 1 in theme.vue</div>
       <div>test 2 in theme.vue</div>
     </parent>
+    <div>{{num.toLocaleString()}}</div>
+    <div class="test-css-module">{{num.toLocaleString()}}</div>
+    <button @click="changeColor">change color</button>
     <el-row>
       <el-button>默认按钮</el-button>
       <el-button type="primary">主要按钮</el-button>
@@ -34,12 +37,19 @@ export default {
   data() {
     return {
       msg: "Dynamic Themes",
-      theme: "red"
+      theme: "red",
+      num: 8462948.24
     };
   },
   computed: {
     themeClass() {
       return `theme-${this.theme}`;
+    }
+  },
+  methods: {
+    changeColor() {
+      // css 自定义变量
+      document.body.style.setProperty("--mytheme-color", "#7F583F");
     }
   }
 };
