@@ -675,7 +675,7 @@
       download (type) {
         this.dialogDownloadVisible = false
         let a = document.createElement('a')
-        a.href = Config.cosmosHost + 'lushu/rest/query/download/' + type + '/' + this.curQueryResult.queryId
+        a.href = Config.myEditorTestHost + 'mytest/rest/query/download/' + type + '/' + this.curQueryResult.queryId
         a.setAttribute('target', '_blank' + this.curQueryResult.queryId)
         a.click()
       },

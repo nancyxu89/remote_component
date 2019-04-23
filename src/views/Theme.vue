@@ -48,6 +48,9 @@ export default {
   },
   methods: {
     changeColor() {
+      //      this.$store.dispatch("changename", "test");
+      this.$store.state.appName = "set directly";
+      console.log(this.$store.state.appName);
       // css 自定义变量
       document.body.style.setProperty("--mytheme-color", "#7F583F");
     }

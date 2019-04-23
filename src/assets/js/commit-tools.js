@@ -6,7 +6,7 @@ let summit = require('./inquirer')
 let rp = require('request-promise')
 let fs = require('fs')
 let request = require('request')
-let accessUrl = 'http://h5-deploy-jenkins.ymmoa.com'
+let accessUrl = ''
 async function getData () {
   let absPath = process.cwd()
   let currBranch = execSync('git symbolic-ref --short -q HEAD',  {cwd: absPath}).toString().split('\n')[0]
@@ -97,7 +97,7 @@ async function getData () {
   await rp({
     url: `${accessUrl}/job/${jobName}/buildWithParameters`,
     headers: {
-      'Authorization': 'Basic cm9vdDoxMjM0NTY3ODk='
+      'Authorization': 'Basic'
     },
     method: 'post',
     formData: {
@@ -118,7 +118,7 @@ async function getData () {
         request({
           url: `${accessUrl}/job/${jobName}/lastBuild/api/json`,
           headers: {
-            'Authorization': 'Basic cm9vdDoxMjM0NTY3ODk=',
+            'Authorization': 'Basic',
           },
           json: true
         }, function (err, res, body) {

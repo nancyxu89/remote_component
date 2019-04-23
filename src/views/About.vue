@@ -192,6 +192,12 @@ export default {
       params: arr,
       data: JSON.stringify(arr)
     });
+    console.log(this.$store.state.appName);
+    console.log(process.memoryUsage());
+
+    import("./Theme.vue").then(rst => {
+      console.log(rst);
+    });
   }
 };
 </script>

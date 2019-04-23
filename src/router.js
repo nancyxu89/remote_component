@@ -5,7 +5,7 @@ import ACE from "./views/ace.vue";
 import Iframe from "./views/iframe.vue";
 import Table from "./views/table.vue";
 import TestNextTick from "./views/TestNextTick.vue";
-import Theme from "./views/Theme.vue";
+// import Theme from "./views/Theme.vue";webpackPrefetch: true;
 
 Vue.use(Router);
 
@@ -40,8 +40,9 @@ export default new Router({
     },
     {
       path: "/theme",
-      name: "Theme",
-      component: Theme
+      name: "theme",
+      component: () =>
+        import(/* webpackChunkName: "theme" */ "./views/Theme.vue")
     },
     {
       path: "/about",

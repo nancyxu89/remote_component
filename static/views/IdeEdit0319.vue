@@ -678,7 +678,7 @@
       download (type) {
         this.dialogDownloadVisible = false
         let a = document.createElement('a')
-        a.href = Config.cosmosHost + 'lushu/rest/query/download/' + type + '/' + this.curQueryResult.queryId
+        a.href = Config.myEditorTestHost + 'mytest/rest/query/download/' + type + '/' + this.curQueryResult.queryId
         a.setAttribute('target', '_blank' + this.curQueryResult.queryId)
         a.click()
       },
@@ -1112,9 +1112,9 @@
                }
                window.extLangAssLib.currentLib = libName
                window.extLangAssLibUrls = {
-                 sonic: 'http://dev-cosmos.ymmoa.com/#/metadata/table-details/3',
-                 dwt: 'http://dev-cosmos.ymmoa.com/#/metadata/table-details/4',
-                 'tmp.dwt_test': 'http://dev-cosmos.ymmoa.com/#/metadata/table-details/5'
+                 sonic: 'http://dev-mytest.testoa.com/#/metadata/table-details/3',
+                 dwt: 'http://dev-mytest.testoa.com/#/metadata/table-details/4',
+                 'tmp.dwt_test': 'http://dev-mytest.testoa.com/#/metadata/table-details/5'
                }
                let editorCom3 = {
                  getCompletions: function(editor, session, pos, prefix, callback) {
@@ -1124,7 +1124,7 @@
                      return callback(null, [
                        {meta: "库", isLib: true, value: "sonic", score: Infinity},
                        {meta: "部门业绩按天统计", isLib: true, value: "tmp.dwt_test", score: Infinity},
-                       {meta: "库", isLib: true, value: "dwt", score: Infinity, id: 90, url: 'http://dev-cosmos.ymmoa.com/#/metadata/table-details/5'},
+                       {meta: "库", isLib: true, value: "dwt", score: Infinity, id: 90, url: 'http://dev-mytest.testoa.com/#/metadata/table-details/5'},
                        //              {meta: "表名称", isLib: false, value: "svn_1220", score:9},
                        //              {meta: "表名称", isLib: false, value: "dbid_ol_crm_test2", score:9, libName: 'dwt'},
                        //              {meta: "表名称", isLib: false, value: "dbid_test2", score:9, libName: 'sonic'}

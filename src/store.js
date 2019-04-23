@@ -4,7 +4,18 @@ import Vuex from "vuex";
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-  state: {},
-  mutations: {},
-  actions: {}
+  strict: true,
+  state: {
+    appName: "myeditor"
+  },
+  mutations: {
+    changename(state, data) {
+      state["appName"] = data;
+    }
+  },
+  actions: {
+    changename: ({ commit }, data) => {
+      commit("changename", data);
+    }
+  }
 });

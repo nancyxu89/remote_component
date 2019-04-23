@@ -4,8 +4,8 @@
             欢迎来到 {{packageInfo.description}}
             <button @click="isShow=!isShow">click</button>
             <iframe style="width: 100%;height: 600px;" :src="iframeSrc"></iframe>
-            <iframe style="width: 100%;height: 600px;" src="http://dev-boss.ymmoa.com/data-index-service/#/secondIndicator"></iframe>
-            <iframe :class="['iframe-style', isShow?'h600':'h0']" src="http://web.ymmoa.com:9100/#/exportApply?key=1&name=test" v-if="isShow"></iframe>
+            <iframe style="width: 100%;height: 600px;" src="http://dev-boss.testoa.com/data-index-service/#/secondIndicator"></iframe>
+            <iframe :class="['iframe-style', isShow?'h600':'h0']" src="http://web.testoa.com:9100/#/exportApply?key=1&name=test" v-if="isShow"></iframe>
         </div>
     </div>
 </template>
@@ -40,7 +40,7 @@ export default {
   data() {
     return {
       isShow: false,
-      iframeSrc: "http://web.ymmoa.com:8800/#/firstIndicator"
+      iframeSrc: "http://web.testoa.com:8800/#/firstIndicator"
     };
   },
   computed: mapState({

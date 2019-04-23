@@ -216,7 +216,7 @@ if (window.watermark.IsPC()) {
 }
 setTimeout(function() {
   // let userInfo = window.watermark.IsPC()
-  //   ? JSON.parse(decodeURIComponent(window.watermark.getCookie("ymmoa_user")))
+  //   ? JSON.parse(decodeURIComponent(window.watermark.getCookie("testoa_user")))
   //   : window.app.userInfo;
   let date = new Date();
   // userInfo &&
